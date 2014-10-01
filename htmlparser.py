@@ -13,13 +13,16 @@ from sgmllib import SGMLParser
  
 
 class htmlparser(SGMLParser):
-
-    contentCheck=False                   # 'contentCheck'  for checking main content   <dl>  tag
-    check_dt=False                             # 'check_dt ' for checking  title    <dt> tag
-    check_dd=False                            # 'check_dd' for  checking  attribute    <dd> tag
-    tag_attr =  ('class', 'dataList')    # 'tag_attr'  for checking  < dl> 's  attribute
-
-    name=[]
+  
+    def reset(self):
+        #using original reset function
+        SGMLParser.reset(self)
+        #initialize variables 
+        self.contentCheck=False                   # 'contentCheck'  for checking main content   <dl>  tag
+        self.check_dt=False                             # 'check_dt ' for checking  title    <dt> tag
+        self.check_dd=False                            # 'check_dd' for  checking  attribute    <dd> tag
+        self.tag_attr =  ('class', 'dataList')    # 'tag_attr'  for checking  < dl> 's  attribute
+        self.name=[]
 
      # checking main content , when read <dl> set  contentCheck =true
     def start_dl (self, attrs):
@@ -58,16 +61,18 @@ class htmlparser(SGMLParser):
     def handle_data(self, text):  
         if self.contentCheck:
           if self.check_dt:
-               print  text,  #  ',' will not print newline 
+               print  text,  #  ',' will not print newline  
           elif   self.check_dd:
                print  text,  #  ',' will not print newline
 
-#open the given url , and read data to content ( type : string )
-content = urllib2.urlopen('http://www.1111.com.tw/%E6%B6%88%E9%98%B2%E8%A8%AD%E5%82%99%E5%A3%AB-%E5%8F%B0%E4%B8%AD%E5%B8%82-%E5%8C%97%E5%B1%AF%E5%8D%80-%E6%89%BE%E5%B7%A5%E4%BD%9C-77058600.htm').read()
 
-data = htmlparser()  #create  SGMLParser object
-data.feed(content)   #Feed content to parser 
-data.close()
+if __name__ == "__main__":
+    #open the given url , and read data to content ( type : string )
+    content = urllib2.urlopen('http://www.1111.com.tw/%E6%B6%88%E9%98%B2%E8%A8%AD%E5%82%99%E5%A3%AB-%E5%8F%B0%E4%B8%AD%E5%B8%82-%E5%8C%97%E5%B1%AF%E5%8D%80-%E6%89%BE%E5%B7%A5%E4%BD%9C-77058600.htm').read()
+    #start parsering html
+    data = htmlparser()  #create  SGMLParser object
+    data.feed(content)   #Feed content to parser 
+    data.close()  #clear buffer
 
 #for i in Tempreature.name:
     #if '\t' not in i:
