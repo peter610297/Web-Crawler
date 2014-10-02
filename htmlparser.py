@@ -17,7 +17,7 @@ class htmlparser(SGMLParser):
     def reset(self):
         #using original reset function
         SGMLParser.reset(self)
-        #initialize variables 
+        #initialization
         self.contentCheck=False                   # 'contentCheck'  for checking main content   <dl>  tag
         self.check_dt=False                             # 'check_dt ' for checking  title    <dt> tag
         self.check_dd=False                            # 'check_dd' for  checking  attribute    <dd> tag
@@ -68,7 +68,7 @@ class htmlparser(SGMLParser):
 
 if __name__ == "__main__":
     #open the given url , and read data to content ( type : string )
-    content = urllib2.urlopen('http://www.1111.com.tw/%E6%B6%88%E9%98%B2%E8%A8%AD%E5%82%99%E5%A3%AB-%E5%8F%B0%E4%B8%AD%E5%B8%82-%E5%8C%97%E5%B1%AF%E5%8D%80-%E6%89%BE%E5%B7%A5%E4%BD%9C-77058600.htm').read()
+    content = urllib2.urlopen('http://www.1111.com.tw/%E5%A4%96%E5%A0%B4%E5%84%B2%E5%82%99%E5%B9%B9%E9%83%A8-%E6%A1%83%E5%9C%92%E7%B8%A3-%E8%98%86%E7%AB%B9%E5%B8%82-%E6%89%BE%E5%B7%A5%E4%BD%9C-76852278.htm').read()
     #start parsering html
     data = htmlparser()  #create  SGMLParser object
     data.feed(content)   #Feed content to parser 
