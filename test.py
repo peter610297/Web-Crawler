@@ -51,44 +51,26 @@ class htmlparser(SGMLParser):
                 self.urls.append("http://www.1111.com.tw"+href[0])          
                 #print href [0]
 
-    url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=160100&si=1&ps=40&trans=1'
+
+url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=160100&si=1&ps=40&trans=1'
+page = '&page='
+
 for i in range(3):
     print '----------------------------------------------------------'
     print '------------               ' ,i ,'                ------------'
     print '----------------------------------------------------------'
-    page = '&page='
     mainpage = url + page + str(i)
+    content = urllib2.urlopen(mainpage).read()
+    #create  SGMLParser object
+    data = htmlparser()  
+    data.feed(content)   #Feed content to parser 
+    for test in data.urls:
+        print test
+    data.clearURLs()
+    data.close()
+
 
 '''
-#open the given url , and read data to content ( type : string )
-url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=160100&si=1&ps=40&trans=1'
-page = '&page='
-a = 1 
-mainpage = url + page + str(a)
-
-
-
-mainpage = url + page + str(a)
-print mainpage
-
-
-content = urllib2.urlopen(mainpage).read()
-
-#create  SGMLParser object
-data = htmlparser()  
-
-###########################
-
-data.feed(content)   #Feed content to parser 
-for test in data.urls:
-    print test
-data.clearURLs()
-
-############################
-
-data.close()
-
-
 test =  'http://www.1111.com.tw/儲備幹部-台中市-大甲區-找工作-76954510.htm'
 print  test
 
