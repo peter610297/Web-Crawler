@@ -4,7 +4,7 @@ import urllib2
 from sgmllib import SGMLParser
 import urllib
 
-class htmlparser(SGMLParser):
+class URLparser(SGMLParser):
 
     def reset(self):
         #using original reset function
@@ -49,27 +49,23 @@ class htmlparser(SGMLParser):
             href = [v for k, v in attrs if k=='href']   
             if href:  
                 self.urls.append("http://www.1111.com.tw"+href[0])          
-                #print href [0]
 
 
-url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=160100&si=1&ps=40&trans=1'
-page = '&page='
+url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=160100&si=1&ps=40&trans=1' +'&page='
+data = URLparser()  
 
-for i in range(3):
+for i in range(1,3):
     print '----------------------------------------------------------'
     print '------------               ' ,i ,'                ------------'
     print '----------------------------------------------------------'
-    mainpage = url + page + str(i)
+    mainpage = url + str(i)
     content = urllib2.urlopen(mainpage).read()
     #create  SGMLParser object
-    data = htmlparser()  
     data.feed(content)   #Feed content to parser 
     for test in data.urls:
         print test
     data.clearURLs()
     data.close()
-
-
 '''
 test =  'http://www.1111.com.tw/儲備幹部-台中市-大甲區-找工作-76954510.htm'
 print  test

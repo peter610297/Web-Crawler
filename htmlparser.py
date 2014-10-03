@@ -2,16 +2,19 @@
 
 '''
 2014  database 
-using SGMLParser html parsering  tool
+using SGMLParser html parseing  tool
 -----------------------
 截取1111人力銀行網頁資訊, 從< div class="datalist"></div>中抓取工作資訊
 -----------------------
 '''
 
 import urllib2
+import urllib
 from sgmllib import SGMLParser
- 
 
+
+##    html parser    ##
+##   save data from web page
 class htmlparser(SGMLParser):
   
     def reset(self):
@@ -33,7 +36,7 @@ class htmlparser(SGMLParser):
           if cmp(attrs[0] , self.tag_attr )==0:
               self.contentCheck=1
 
-    # stop parsering main content when read </dl>
+    # stop parsing main content when read </dl>
     def end_dl (self):
         self.contentCheck=False
 
@@ -41,7 +44,7 @@ class htmlparser(SGMLParser):
     def start_dt(self, attrs):
         self.check_dt=1
      
-     #stop parsering <dt> tag
+     #stop parsing <dt> tag
     def end_dt(self):
         self.check_dt=False
 
@@ -49,9 +52,9 @@ class htmlparser(SGMLParser):
     def start_dd(self, attrs):
         self.check_dd=1
 
-    #stop parsering <dd> tag
-    #print newline when </dd>  is in main content
+    #stop parsing <dd> tag
     def end_dd (self):
+        #print newline when </dd>  is in main content
         if self.contentCheck:
              print  "\n"  
         self.check_dd=False
@@ -66,14 +69,91 @@ class htmlparser(SGMLParser):
                print  text,  #  ',' will not print newline
 
 
-if __name__ == "__main__":
-    #open the given url , and read data to content ( type : string )
-    content = urllib2.urlopen('http://www.1111.com.tw/%E5%A4%96%E5%A0%B4%E5%84%B2%E5%82%99%E5%B9%B9%E9%83%A8-%E6%A1%83%E5%9C%92%E7%B8%A3-%E8%98%86%E7%AB%B9%E5%B8%82-%E6%89%BE%E5%B7%A5%E4%BD%9C-76852278.htm').read()
-    #start parsering html
-    data = htmlparser()  #create  SGMLParser object
-    data.feed(content)   #Feed content to parser 
-    data.close()  #clear buffer
+##   html parser ##
+##   save data from web page
+class URLparser(SGMLParser):
 
-#for i in Tempreature.name:
-    #if '\t' not in i:
-       # print i.decode('utf-8')                
+    def reset(self):
+        #using original reset function
+        SGMLParser.reset(self)
+        #initialization
+        self.check_dl= False               # checking <dl> tag 
+        self.check_dd= False             #  checking <dd> tag
+        self.check_li= False                #  checking <li> tag
+        self.dl_attr = ('id', 'job_result')                       # use for searching  <dl> tag  with "id = job_result" 
+        self.a_attr =('class', 'showPositionCss')     # use for searching  <a> tag with "id = showPositionCss"
+        self.urls = []  
+
+    # clear all data in the urls
+    def  clearURLs(self):
+         del self.urls [:]  
+
+     # when read <dl> set  contentCheck =true
+    def start_dl (self, attrs):
+        # read <dl> tag with 2 attributes
+        if len(attrs)  ==2: 
+             # set check_dl when <dl>  attribute equal to ('id', 'job_result')
+            if cmp(attrs[0] , self.dl_attr ) == 0 :
+                 self.check_dl= 1
+
+    #stop parsing <dl> tag 
+    def end_dl (self):
+        self.check_dl= False
+     
+     # start parsing <dd> tag
+    def start_dd (self, attrs):
+        self.check_dd = 1
+
+    # stop parsing <dd> tag
+    def end_dd (self ):
+        self.check_dd = False
+
+    # start parsing <li > tag 
+    def  start_li(self, attrs):
+        #read <li>  when <li>  is in the right  <dl> & <dd>
+        if  self.check_dl and  self.check_dd :
+             #compare <a> 's  attribute with  ('class', 'showPositionCss') 
+             # then set check_li = true
+            if cmp(attrs[0] , self.a_attr ) == 0 :
+                 self.check_li =1 
+
+     #stop parsing  <li> tag 
+    def end_li (self ):
+        self.check_li= False
+     
+     # start parsing <a> tag 
+    def start_a(self, attrs):
+        # get  web url in the <a>   tag  
+        if self.check_li :
+            href = [v for k, v in attrs if k=='href'] 
+            # save  url  in the  urls list 
+            if href:  
+                self.urls.append( href[0] )          
+
+
+
+if __name__ == "__main__":
+
+    url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=160100&si=1&ps=40&trans=1' +'&page='
+    url_data = URLparser()       # create   URLparser  object
+    html_data = htmlparser()  # create   htmlparser  object
+      
+    #  parsing each page 
+    for  page in range(1,20):
+        mainpage = url + str(page)
+        #create  SGMLParser object
+        url_data.feed( urllib2.urlopen(mainpage).read() )   #Feed content to parser 
+
+        #get data from web 
+        for i in url_data.urls:
+            print '===============================================  page : ' , page
+            # encode chinese urls
+            urlencode = "http://www.1111.com.tw"+  urllib.quote( i )
+            html_data.feed( urllib2.urlopen( urlencode ).read() )
+    
+       # clear all url in the urls list 
+        url_data.clearURLs()
+
+    url_data.close()       #clear buffer  
+    html_data.close()   #clear buffer     
+  
