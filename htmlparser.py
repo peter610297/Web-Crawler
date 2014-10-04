@@ -7,9 +7,9 @@ using SGMLParser html parseing  tool
 截取1111人力銀行網頁資訊, 從< div class="datalist"></div>中抓取工作資訊
 -----------------------
 '''
-
-import urllib2
 import urllib
+import urllib2
+import sys
 from sgmllib import SGMLParser
 
 
@@ -134,26 +134,29 @@ class URLparser(SGMLParser):
 
 if __name__ == "__main__":
 
-    url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=160100&si=1&ps=40&trans=1' +'&page='
+    url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=100100&si=1&ps=40&trans=1' +'&page='
     url_data = URLparser()       # create   URLparser  object
     html_data = htmlparser()  # create   htmlparser  object
       
     #  parsing each page 
-    for  page in range(1,20):
+    for  page in range(1,5):
+        print ' page : ' , page,
         mainpage = url + str(page)
         #create  SGMLParser object
         url_data.feed( urllib2.urlopen(mainpage).read() )   #Feed content to parser 
+        print len(url_data.urls)
 
-        #get data from web 
-        for i in url_data.urls:
-            print '===============================================  page : ' , page
-            # encode chinese urls
-            urlencode = "http://www.1111.com.tw"+  urllib.quote( i )
-            html_data.feed( urllib2.urlopen( urlencode ).read() )
-    
-       # clear all url in the urls list 
-        url_data.clearURLs()
 
-    url_data.close()       #clear buffer  
-    html_data.close()   #clear buffer     
+    url_data.close()       #clear buffer    
+
+    #get data from web   
+    for i in url_data.urls:
+        # encode chinese urls
+        print i
+        urlencode = "http://www.1111.com.tw"+  urllib.quote(i )
+
+        html_data.feed( urllib2.urlopen( urlencode.replace('%09','%20')  ).read() )
+
+      
+    html_data.close()   #clear buffer   
   
