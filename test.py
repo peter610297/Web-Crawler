@@ -1,8 +1,29 @@
  # -*- coding: UTF-8 -*-
+from __future__ import division
 import urllib2
 import urllib
 from sgmllib import SGMLParser
+import sys,time
+import  os
 
-b='http://www.1111.com.tw/%E6%97%A9%E9%A4%90%E5%BA%97%E5%84%B2%E5%82%99%E5%BA%97%E9%95%B7%09-%E6%96%B0%E5%8C%97%E5%B8%82-%E6%B1%90%E6%AD%A2%E5%8D%80-%E6%89%BE%E5%B7%A5%E4%BD%9C-77015381.htm'
-a=b.replace('%09','%20') 
-print a
+class ProgressBar():
+    def __init__(self, lenth=100):
+        self.pointer = 0
+        self.width = 50
+        self.range = lenth
+        self.count = 0
+
+    def __call__(self):
+         # x in percent
+         self.pointer = int(self.width*(self.count /self.range))
+         #return "|" + "#"*self.pointer + "-"*(self.width-self.pointer)+"| %d /"% int(x)+str(self.range)+"  Done"
+         sys.stdout.write("|" + "#"*self.pointer + "-"*(self.width-self.pointer)+"|  "+str(self.count )+'/'+str(self.range)+' ('+str(int((self.count /self.range)*100))+'%) Done'+"\r")
+         sys.stdout.flush()
+         self.count +=1
+if __name__ == '__main__':
+    pb = ProgressBar(200)
+    for i in range(200):
+        #os.system('clear')
+        #print pb(i)
+        pb()
+        time.sleep(0.1)

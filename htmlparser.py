@@ -7,12 +7,11 @@ using SGMLParser html parseing  tool
 截取1111人力銀行網頁資訊, 從< div class="datalist"></div>中抓取工作資訊
 -----------------------
 '''
+from __future__ import division
+from sgmllib import SGMLParser
 import urllib
 import urllib2
 import sys
-from sgmllib import SGMLParser
-
-
 ##    html parser    ##
 ##   save data from web page
 class htmlparser(SGMLParser):
@@ -55,19 +54,20 @@ class htmlparser(SGMLParser):
     #stop parsing <dd> tag
     def end_dd (self):
         #print newline when </dd>  is in main content
-        if self.contentCheck:
-             print  "\n"  
+        #if self.contentCheck:
+             #print  "\n"  
         self.check_dd=False
 
     #get the data  between <dt> and  </dt>  for  title
     #                                            <dd> and </dd>  for  contents
+    '''
     def handle_data(self, text):  
         if self.contentCheck:
           if self.check_dt:
                print  text,  #  ',' will not print newline  
           elif   self.check_dd:
                print  text,  #  ',' will not print newline
-
+  '''
 
 ##   html parser ##
 ##   save data from web page
@@ -130,16 +130,28 @@ class URLparser(SGMLParser):
             if href:  
                 self.urls.append( href[0] )          
 
+class ProgressBar():
+    def __init__(self, lenth=100):
+        self.pointer = 0
+        self.width = 75
+        self.range = lenth
+        self.count = 0
 
+    def __call__(self):
+         # x in percent
+         self.pointer = int(self.width*(self.count /self.range))
+         #return "|" + "#"*self.pointer + "-"*(self.width-self.pointer)+"| %d /"% int(x)+str(self.range)+"  Done"
+         sys.stdout.write("|" + "#"*self.pointer + "-"*(self.width-self.pointer)+"|  "+str(self.count )+'/'+str(self.range)+' ('+str(int((self.count /self.range)*100))+'%) Done'+"\r")
+         sys.stdout.flush()
+         self.count +=1
 
 if __name__ == "__main__":
 
     url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=100100&si=1&ps=40&trans=1' +'&page='
     url_data = URLparser()       # create   URLparser  object
-    html_data = htmlparser()  # create   htmlparser  object
       
     #  parsing each page 
-    for  page in range(1,5):
+    for  page in range(1,10):
         print ' page : ' , page,
         mainpage = url + str(page)
         #create  SGMLParser object
@@ -149,14 +161,23 @@ if __name__ == "__main__":
 
     url_data.close()       #clear buffer    
 
+     
+    html_data = htmlparser()  # create   htmlparser  object
+    urlencode = ""
+    progress = ProgressBar( len( url_data.urls ) )
+
     #get data from web   
     for i in url_data.urls:
-        # encode chinese urls
-        print i
-        urlencode = "http://www.1111.com.tw"+  urllib.quote(i )
 
-        html_data.feed( urllib2.urlopen( urlencode.replace('%09','%20')  ).read() )
+        progress()
+        try:
+             urlencode = "http://www.1111.com.tw"+  urllib.quote(i ).replace('%09','%20')
+             urlobject   = urllib2.urlopen( urlencode )
+             html_data.feed( urlobject.read() )
 
-      
+        except urllib2.HTTPError:
+             print "not "
+
+    print
     html_data.close()   #clear buffer   
   
