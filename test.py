@@ -20,6 +20,7 @@ class ProgressBar():
          sys.stdout.write("|" + "#"*self.pointer + "-"*(self.width-self.pointer)+"|  "+str(self.count )+'/'+str(self.range)+' ('+str(int((self.count /self.range)*100))+'%) Done'+"\r")
          sys.stdout.flush()
          self.count +=1
+
 if __name__ == '__main__':
     pb = ProgressBar(200)
     for i in range(200):

@@ -12,6 +12,8 @@ from sgmllib import SGMLParser
 import urllib
 import urllib2
 import sys
+
+
 ##    html parser    ##
 ##   save data from web page
 class htmlparser(SGMLParser):
@@ -20,9 +22,9 @@ class htmlparser(SGMLParser):
         #using original reset function
         SGMLParser.reset(self)
         #initialization
-        self.contentCheck=False                   # 'contentCheck'  for checking main content   <dl>  tag
-        self.check_dt=False                             # 'check_dt ' for checking  title    <dt> tag
-        self.check_dd=False                            # 'check_dd' for  checking  attribute    <dd> tag
+        self.contentCheck=False                 # 'contentCheck'  for checking main content   <dl>  tag
+        self.check_dt=False                         # 'check_dt ' for checking  title    <dt> tag
+        self.check_dd=False                        # 'check_dd' for  checking  attribute    <dd> tag
         self.tag_attr =  ('class', 'dataList')    # 'tag_attr'  for checking  < dl> 's  attribute
         self.name=[]
 
@@ -59,7 +61,7 @@ class htmlparser(SGMLParser):
         self.check_dd=False
 
     #get the data  between <dt> and  </dt>  for  title
-    #                                            <dd> and </dd>  for  contents
+    #                                     <dd> and </dd>  for  contents
     '''
     def handle_data(self, text):  
         if self.contentCheck:
@@ -67,7 +69,7 @@ class htmlparser(SGMLParser):
                print  text,  #  ',' will not print newline  
           elif   self.check_dd:
                print  text,  #  ',' will not print newline
-  '''
+    '''
 
 ##   html parser ##
 ##   save data from web page
@@ -78,9 +80,9 @@ class URLparser(SGMLParser):
         SGMLParser.reset(self)
         #initialization
         self.check_dl= False               # checking <dl> tag 
-        self.check_dd= False             #  checking <dd> tag
+        self.check_dd= False              #  checking <dd> tag
         self.check_li= False                #  checking <li> tag
-        self.dl_attr = ('id', 'job_result')                       # use for searching  <dl> tag  with "id = job_result" 
+        self.dl_attr = ('id', 'job_result')                   # use for searching  <dl> tag  with "id = job_result" 
         self.a_attr =('class', 'showPositionCss')     # use for searching  <a> tag with "id = showPositionCss"
         self.urls = []  
 
@@ -134,16 +136,18 @@ class ProgressBar():
     def __init__(self, lenth=100):
         self.pointer = 0
         self.width = 75
-        self.range = lenth
+        self.range = lenth -1
         self.count = 0
 
-    def __call__(self):
-         # x in percent
+    def start(self):
          self.pointer = int(self.width*(self.count /self.range))
-         #return "|" + "#"*self.pointer + "-"*(self.width-self.pointer)+"| %d /"% int(x)+str(self.range)+"  Done"
-         sys.stdout.write("|" + "#"*self.pointer + "-"*(self.width-self.pointer)+"|  "+str(self.count )+'/'+str(self.range)+' ('+str(int((self.count /self.range)*100))+'%) Done'+"\r")
+         sys.stdout.write("|" + ">"*self.pointer + "-"*(self.width-self.pointer)+"|"+str(int((self.count /self.range)*100))+'%  ['+str(self.count +1)+'/'+str(self.range+1)+'] '+"\r")
          sys.stdout.flush()
          self.count +=1
+
+    def end(self):
+         if self.count == self.range+1: 
+              print
 
 if __name__ == "__main__":
 
@@ -151,33 +155,39 @@ if __name__ == "__main__":
     url_data = URLparser()       # create   URLparser  object
       
     #  parsing each page 
-    for  page in range(1,10):
-        print ' page : ' , page,
+    for  page in range(1,2):
         mainpage = url + str(page)
         #create  SGMLParser object
         url_data.feed( urllib2.urlopen(mainpage).read() )   #Feed content to parser 
-        print len(url_data.urls)
 
+        sys.stdout.write('catching urls... '+str( len(url_data.urls) )+"\r")
+        sys.stdout.flush()
 
     url_data.close()       #clear buffer    
-
+     
+    print "\nstart parsing websites..."
      
     html_data = htmlparser()  # create   htmlparser  object
     urlencode = ""
+    urlremove = 0
     progress = ProgressBar( len( url_data.urls ) )
 
     #get data from web   
     for i in url_data.urls:
 
-        progress()
+        progress.start()
+
         try:
              urlencode = "http://www.1111.com.tw"+  urllib.quote(i ).replace('%09','%20')
              urlobject   = urllib2.urlopen( urlencode )
              html_data.feed( urlobject.read() )
 
         except urllib2.HTTPError:
-             print "not "
+             urlremove += 1
 
-    print
+        progress.end()
+
+    print  urlremove ,"not found ..."
+    print "Done ..." 
     html_data.close()   #clear buffer   
   
