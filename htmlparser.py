@@ -192,7 +192,7 @@ if __name__ == "__main__":
         except urllib2.HTTPError:
              urlremove += 1
 
-        sql.insert( html.data[0] ) 
+        sql.insert( str(html.data[0]) ) 
 
         html.cleardata()
 
