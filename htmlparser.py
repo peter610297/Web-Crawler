@@ -11,7 +11,7 @@ from __future__ import division
 from sgmllib import SGMLParser
 import urllib
 import urllib2
-import _mssql
+import sql
 import sys
 
 
@@ -19,7 +19,7 @@ import sys
 ##   save data from web page
 class htmlparser(SGMLParser):
   
-    def reset(self):
+    def reset(self):    
         #using original reset function
         SGMLParser.reset(self)
         #initialization
@@ -152,20 +152,6 @@ class ProgressBar():
          if self.count == self.range+1: 
               print
 
-class MS_SQL():
-    def __init__(self, h,u,p,d):
-        self.host = h
-        self.user = u
-        self.password = p
-        self.db = d
-        self.conn = None
-
-    def connect(self):
-        self.conn = _mssql.connect(server=self.host, user=self.user, password=self.password, database=self.db)
-
-    def insert(self, n):
-        self.conn.execute_non_query("INSERT INTO test VALUES('"+n+ "')")
-
 
 if __name__ == "__main__":
 
@@ -187,7 +173,7 @@ if __name__ == "__main__":
     print "\nstart parsing websites ..."
      
     html = htmlparser()  # create   htmlparser  object
-    sql = MS_SQL('140.116.86.51','sa','imilab0936200028*','IMI_db_project')
+    sql = sql.MS_SQL('140.116.86.51','sa','imilab0936200028*','IMI_db_project')
     urlencode = ""
     urlremove = 0
     progress = ProgressBar( len( url_data.urls ) )

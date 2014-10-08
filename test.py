@@ -5,9 +5,7 @@ import urllib
 from sgmllib import SGMLParser
 import sys,time
 import  os
+import sql
 
-x='asd : '
-b='asd : '
-print x == b
-test =  ['a','b','c']
-print  test[0]
+
+new = sql.test()

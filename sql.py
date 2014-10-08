@@ -5,17 +5,19 @@
 #password : imilab0936200028*
 
 import _mssql
-server = "140.116.86.51"
-user = "sa"
-password = "imilab0936200028*"
-db = "IMI_db_project"
 
-conn = None
-conn = _mssql.connect(server='140.116.86.51', user='sa', password='imilab0936200028*', database=db)
-'''
-a ='fuck you all'
-insert = "INSERT INTO test VALUES('"+a+ "')"
-print insert 
-print type(a)
-conn.execute_non_query("INSERT INTO test VALUES('"+a+ "')")
-'''
+class MS_SQL():
+    def __init__(self, h,u,p,d):
+        self.host = h
+        self.user = u
+        self.password = p
+        self.db = d
+        self.conn = None
+
+    def connect(self):
+        self.conn = _mssql.connect(server=self.host, user=self.user, password=self.password, database=self.db)
+
+    def insert(self, n):
+        self.conn.execute_non_query("INSERT INTO test VALUES('"+n+ "')")
+
+
