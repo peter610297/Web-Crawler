@@ -12,7 +12,7 @@ from sgmllib import SGMLParser
 import urllib
 import urllib2
 import sql
-import sys
+import sys 
 
 
 ##    html parser    ##
@@ -184,8 +184,6 @@ if __name__ == "__main__":
     for i in url_data.urls:
 
         progress.start()
-
-
 
         try:
              urlencode = "http://www.1111.com.tw"+  urllib.quote(i ).replace('%09','%20')
