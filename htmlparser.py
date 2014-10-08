@@ -11,6 +11,7 @@ from __future__ import division
 from sgmllib import SGMLParser
 import urllib
 import urllib2
+import _mssql
 import sys
 
 
@@ -26,7 +27,7 @@ class htmlparser(SGMLParser):
         self.check_dt=False                         # 'check_dt ' for checking  title    <dt> tag
         self.check_dd=False                        # 'check_dd' for  checking  attribute    <dd> tag
         self.tag_attr =  ('class', 'dataList')    # 'tag_attr'  for checking  < dl> 's  attribute
-        self.name=[]
+        self.data = []  
 
      # checking main content , when read <dl> set  contentCheck =true
     def start_dl (self, attrs):
@@ -62,14 +63,16 @@ class htmlparser(SGMLParser):
 
     #get the data  between <dt> and  </dt>  for  title
     #                                     <dd> and </dd>  for  contents
-    '''
+    
     def handle_data(self, text):  
         if self.contentCheck:
-          if self.check_dt:
-               print  text,  #  ',' will not print newline  
-          elif   self.check_dd:
-               print  text,  #  ',' will not print newline
-    '''
+          #if self.check_dt:
+                 #text,  #  ',' will not print newline  
+          if   self.check_dd:
+               self.data.append(text)  #  ',' will not print newline
+
+    def  cleardata(self):
+         del self.data [:] 
 
 ##   html parser ##
 ##   save data from web page
@@ -135,7 +138,7 @@ class URLparser(SGMLParser):
 class ProgressBar():
     def __init__(self, lenth=100):
         self.pointer = 0
-        self.width = 75
+        self.width = 50
         self.range = lenth -1
         self.count = 0
 
@@ -149,45 +152,70 @@ class ProgressBar():
          if self.count == self.range+1: 
               print
 
+class MS_SQL():
+    def __init__(self, h,u,p,d):
+        self.host = h
+        self.user = u
+        self.password = p
+        self.db = d
+        self.conn = None
+
+    def connect(self):
+        self.conn = _mssql.connect(server=self.host, user=self.user, password=self.password, database=self.db)
+
+    def insert(self, n):
+        self.conn.execute_non_query("INSERT INTO test VALUES('"+n+ "')")
+
+
 if __name__ == "__main__":
 
     url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=100100&si=1&ps=40&trans=1' +'&page='
     url_data = URLparser()       # create   URLparser  object
-      
+    pagenum = input('Pages：')
+
     #  parsing each page 
-    for  page in range(1,2):
+    for  page in range(1, pagenum+1):
         mainpage = url + str(page)
         #create  SGMLParser object
         url_data.feed( urllib2.urlopen(mainpage).read() )   #Feed content to parser 
 
-        sys.stdout.write('catching urls... '+str( len(url_data.urls) )+"\r")
+        sys.stdout.write('catching urls ... ['+str( len(url_data.urls) )+"]\r")
         sys.stdout.flush()
 
     url_data.close()       #clear buffer    
      
-    print "\nstart parsing websites..."
+    print "\nstart parsing websites ..."
      
-    html_data = htmlparser()  # create   htmlparser  object
+    html = htmlparser()  # create   htmlparser  object
+    sql = MS_SQL('140.116.86.51','sa','imilab0936200028*','IMI_db_project')
     urlencode = ""
     urlremove = 0
     progress = ProgressBar( len( url_data.urls ) )
+
+    sql.connect()
 
     #get data from web   
     for i in url_data.urls:
 
         progress.start()
 
+
+
         try:
              urlencode = "http://www.1111.com.tw"+  urllib.quote(i ).replace('%09','%20')
              urlobject   = urllib2.urlopen( urlencode )
-             html_data.feed( urlobject.read() )
-
+             html.feed( urlobject.read() )
         except urllib2.HTTPError:
              urlremove += 1
 
+        sql.insert( html.data[0] ) 
+
+        html.cleardata()
+
         progress.end()
 
-    print  urlremove ,"not found ..."
+    # finally print out
+    print "not found [",urlremove ,']'
     print "Done ..." 
-    html_data.close()   #clear buffer   
+    html.close()   #clear buffer   
   
