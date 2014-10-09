@@ -7,5 +7,6 @@ import sys,time
 import  os
 import sql
 
+test = ['','','','','','','','','']
+print test[0]
 
-new = sql.test()
