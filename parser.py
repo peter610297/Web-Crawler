@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
 from sgmllib import SGMLParser
+
+
 ##    html parser    ##
 ##   save data from web page
 class htmlparser(SGMLParser):
@@ -8,10 +10,12 @@ class htmlparser(SGMLParser):
         #using original reset function
         SGMLParser.reset(self)
         #initialization
-        self.contentCheck=False                 # 'contentCheck'  for checking main content   <dl>  tag
-        self.check_dt=False                         # 'check_dt ' for checking  title    <dt> tag
-        self.check_dd=False                        # 'check_dd' for  checking  attribute    <dd> tag
-        self.tag_attr =  ('class', 'dataList')    # 'tag_attr'  for checking  < dl> 's  attribute
+        self.contentCheck = False                 # 'contentCheck'  for checking main content   <dl>  tag
+        self.check_div = False
+        self.check_h2 = False
+        self.check_dt = False                         # 'check_dt ' for checking  title    <dt> tag
+        self.check_dd = False                        # 'check_dd' for  checking  attribute    <dd> tag
+        self.tag_attr =  ('class', 'section w570')    # 'tag_attr'  for checking  < dl> 's  attribute
         self.list_type = ""
         self.name = ""
         self.list = {}
@@ -22,17 +26,24 @@ class htmlparser(SGMLParser):
         self.list = { 1: "",2: "",3: "", 4: "", 5: "", 6: "", 7: ""}
 
      # checking main content , when read <dl> set  contentCheck =true
-    def start_dl (self, attrs):
+    def start_div (self, attrs):
         #check <dl>  with  one attribute
         if len(attrs)  ==1: 
           #compare attribute with  [ class =""datalist ]
           #if true than set contentCheck to true
           if cmp(attrs[0] , self.tag_attr )==0:
-              self.contentCheck=1
+              self.check_div=1
 
     # stop parsing main content when read </dl>
     def end_dl (self):
-        self.contentCheck=False
+        self.check_div=False
+
+    def start_h2(self, attrs):
+        self.check_h2=1
+     
+     #stop parsing <dt> tag
+    def end_h2(self):
+        self.check_h2=False
 
      # checking title , when read <dt> tag  set check_dt = true  
     def start_dt(self, attrs):
@@ -57,11 +68,15 @@ class htmlparser(SGMLParser):
     #                                     <dd> and </dd>  for  contents
     
     def handle_data(self, text):  
-        if self.contentCheck:
-           if self.check_dt :
-                self.list_type = text
-           if   self.check_dd:
+        if self.check_div:
 
+           if self.check_h2: 
+                self.name = text
+
+           elif self.check_dt :
+                self.list_type = text
+
+           elif   self.check_dd:
                 if self.list_type == '工作內容：':
                       self.list[1] += text 
                 elif self.list_type == '工作地點：':

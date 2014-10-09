@@ -80,8 +80,8 @@ if __name__ == "__main__":
              html.feed( urlobject.read() )
         except urllib2.HTTPError:
              urlremove += 1
-
-        print "\n"+html.list[1]
+       
+        print "name:",html.name,"\n"+html.list[2]
         #sql.insert( str(html.data[0]) ) 
 
 
