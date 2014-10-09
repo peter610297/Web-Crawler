@@ -36,12 +36,11 @@ class ProgressBar():
 
 if __name__ == "__main__":
 
-    url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=140100&si=1&ps=40&trans=1' +'&page='
+    url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=120100&si=1&ps=40&trans=1' +'&page='
     url_data = parser.URLparser()       # create   URLparser  object
 
 
     cate = input('Category : ')
-    location = input('Location : ')
     pagenum = input('Pages：')
 
 
@@ -68,13 +67,14 @@ if __name__ == "__main__":
 
 
     sql.connect()
-
+    count = 1 
     #get data from web   
+
     for i in url_data.urls:
 
         html.resetdata()
 
-        #progress.start()
+        progress.start()
 
         try:
              urlencode = "http://www.1111.com.tw"+  urllib.quote(i ).replace('%09','%20')
@@ -82,13 +82,16 @@ if __name__ == "__main__":
              html.feed( urlobject.read() )
         except urllib2.HTTPError:
              urlremove += 1
-       
-        print "name:",html.name,"\n"+html.list[6]
-        #sql.insert( str(html.data[0]) ) 
 
 
-        #progress.end()
+        # id name content  location time holiday property category salary employee class url
+        sql.insert(str(count), html.name,html.list[1],html.list[2],html.list[3],"taiwan",\
+                         html.list[4],html.list[5],html.list[6],html.list[7],str(cate), urlencode )
+        #sql.insert(str(count),"1","1","1","1","1","1","1","1","1","1","1")
+                       
+        count+=1
 
+        progress.end()
 
 
     # finally print out

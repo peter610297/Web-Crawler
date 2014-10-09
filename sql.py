@@ -17,7 +17,10 @@ class MS_SQL():
     def connect(self):
         self.conn = _mssql.connect(server=self.host, user=self.user, password=self.password, database=self.db)
 
-    def insert(self, n):
-        self.conn.execute_non_query("INSERT INTO test VALUES('"+n+ "')")
+#    def insert(self, n):
+ #      self.conn.execute_non_query("INSERT INTO test VALUES('"+n+ "')")
 
 
+    def insert(self, id, name, c, loc, time, h, p, cate, sal, emp, cla, url):
+        self.conn.execute_non_query("INSERT INTO result VALUES( '"+id+ "','"+name+ "','"+c+ "','"+loc+ "','"+time+ "','"+h+ "',\
+        	                                                                                               '"+p+ "','"+cate+ "','"+sal+ "','"+emp+ "','"+cla+ "','"+url+ "')" )
