@@ -40,9 +40,10 @@ if __name__ == "__main__":
     url_data = parser.URLparser()       # create   URLparser  object
 
 
-    pagenum = input('Pages：')
     cate = input('Category : ')
     location = input('Location : ')
+    pagenum = input('Pages：')
+
 
     #  parsing each page 
     for  page in range(1, pagenum+1):
@@ -72,6 +73,7 @@ if __name__ == "__main__":
     for i in url_data.urls:
 
         html.resetdata()
+
         #progress.start()
 
         try:
@@ -81,7 +83,7 @@ if __name__ == "__main__":
         except urllib2.HTTPError:
              urlremove += 1
        
-        print "name:",html.name,"\n"+html.list[2]
+        print "name:",html.name,"\n"+html.list[6]
         #sql.insert( str(html.data[0]) ) 
 
 

@@ -77,24 +77,23 @@ class htmlparser(SGMLParser):
                 self.list_type = text
 
            elif   self.check_dd:
-                if self.list_type == '工作內容：':
+                if self.list_type == '工作內容：' :
                       self.list[1] += text 
-                elif self.list_type == '工作地點：':
+                elif self.list_type == '工作地點：' :
                       self.list[2] += text 
-                elif self.list_type == '工作時間：':
+                elif self.list_type == '工作時間：' :
                       self.list[3] += text 
-                elif self.list_type == '工作性質 : ':
+                elif self.list_type == '工作性質 : ' :
                       self.list[4] += text 
-                elif self.list_type == '職務類別：':
+                elif self.list_type == '職務類別：' :
                       self.list[5] += text 
-                elif self.list_type == '工作待遇：':
+                elif self.list_type == '工作待遇：' :
+                      if text != '面議　'  :               
+                           text = text.replace(",", "").replace("元", "").replace(" ", "")
+                           text =  text[text.index('至')+3:]
                       self.list[6] += text 
-                elif self.list_type == '需求人數：':
+                elif self.list_type == '需求人數：' :
                       self.list[7] += text 
-                #print text
-                #self.list[ self.list_type ] += text
-                #print self.list[ self.list_type ]
-                #print text
 
 
 
