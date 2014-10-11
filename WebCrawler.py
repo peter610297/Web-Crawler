@@ -26,23 +26,26 @@ class ProgressBar():
 
     def start(self):
          self.pointer = int(self.width*(self.count /self.range))
-         sys.stdout.write("|" + ">"*self.pointer + "-"*(self.width-self.pointer)+"|"+str(int((self.count /self.range)*100))+'%  ['+str(self.count +1)+'/'+str(self.range+1)+'] '+"\r")
+         sys.stdout.write("|" + ">"*self.pointer + "-"*(self.width-self.pointer)+"|"+str(int((self.count /self.range)*100))+'% ('+str(self.count +1)+' pages) '+"\r")
          sys.stdout.flush()
          self.count +=1
 
-    def end(self):
-         if self.count == self.range+1: 
-              print
 
 if __name__ == "__main__":
 
+
+    print " -- [Category] --"
+    print "(1)資訊工程(2)人事行政(3)金融保險(4)生活服務"
+    print "(5)醫療保健(6)採購物流(7)餐飲服務(8)電子通訊\n --"
+
+    cate = input('Select a category: ')
+    pagenum = input('How many Pages：')
+     
+    category= { 1: "資訊工程",2: "人事行政",3: "金融保險", 4: "生活服務", \
+                       5: "醫療保健", 6: "採購物流", 7: "餐飲服務",8: "電子通訊"}
+
     url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=120100&si=1&ps=40&trans=1' +'&page='
     url_data = parser.URLparser()       # create   URLparser  object
-
-
-    cate = input('Category : ')
-    pagenum = input('Pages：')
-
 
     #  parsing each page 
     for  page in range(1, pagenum+1):
@@ -55,21 +58,19 @@ if __name__ == "__main__":
 
     url_data.close()       #clear buffer    
      
-    print "\nstart parsing websites ..."
-     
-
      
     html = parser.htmlparser()  # create   htmlparser  object
     sql = sql.MS_SQL('140.116.86.51','sa','imilab0936200028*','IMI_db_project')
     urlencode = ""
     urlremove = 0
+    count = 1 
     progress = ProgressBar( len( url_data.urls ) )
 
 
     sql.connect()
-    count = 1 
-    #get data from web   
 
+    print "\nstart parsing websites ..."
+    #get data from web   
     for i in url_data.urls:
 
         html.resetdata()
@@ -85,17 +86,18 @@ if __name__ == "__main__":
 
 
         # id name content  location time holiday property category salary employee class url
-        sql.insert(str(count), html.name,html.list[1],html.list[2],html.list[3],"taiwan",\
-                         html.list[4],html.list[5],html.list[6],html.list[7],str(cate), urlencode )
+        #sql.insert(str(count) , html.name , html.list[1] , html.list[2] , html.list[3] , "taiwan" ,\
+                         #html.list[4] , html.list[5] , html.list[6] , html.list[7] , category[cate] , urlencode )
         #sql.insert(str(count),"1","1","1","1","1","1","1","1","1","1","1")
                        
         count+=1
 
-        progress.end()
 
 
-    # finally print out
-    print "not found [",urlremove ,']'
-    print "Done ..." 
+    #print result
+    print "\n\n -- [DONE] --"
+    print "Finished---------[" +str(count-urlremove-1)+"/"+str(count-1) +"]"
+    print "Html not found---[",urlremove ,'] \n --' 
+
     html.close()   #clear buffer   
   
