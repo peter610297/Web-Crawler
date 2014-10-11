@@ -1,31 +1,27 @@
 # -*- coding: UTF-8 -*-
 
-'''
-2014  database 
-using SGMLParser html parseing  tool
------------------------
-截取1111人力銀行網頁資訊, 從< div class="datalist"></div>中抓取工作資訊
------------------------
-'''
 from __future__ import division
 from sgmllib import SGMLParser
 import urllib
 import urllib2
 import sys 
-
-import sql
+import sql        
 import parser
 
 
 class ProgressBar():
-    def __init__(self, lenth=100):
-        self.pointer = 0
-        self.width = 50
-        self.range = lenth -1
-        self.count = 0
 
-    def start(self):
+    def __init__(self, lenth):
+        self.pointer = 0            # '>' 's  length
+        self.width = 50             #Width of progress bar
+        self.range = lenth -1   #Number of total URLs
+        self.count = 0              #Number of read URLs
+
+    def start(self): 
+         #Calculate lenth of pointer
          self.pointer = int(self.width*(self.count /self.range))
+
+         #Print progress bar & progress percentage & number of  pages read
          sys.stdout.write("|" + ">"*self.pointer + "-"*(self.width-self.pointer)+"|"+str(int((self.count /self.range)*100))+'% ('+str(self.count +1)+' pages) '+"\r")
          sys.stdout.flush()
          self.count +=1
@@ -33,71 +29,97 @@ class ProgressBar():
 
 if __name__ == "__main__":
 
-
-    print " -- [Category] --"
+    #Print all Categories of the job
+    print "--- [Category] ---"
     print "(1)資訊工程(2)人事行政(3)金融保險(4)生活服務"
-    print "(5)醫療保健(6)採購物流(7)餐飲服務(8)電子通訊\n --"
+    print "(5)醫療保健(6)採購物流(7)餐飲服務(8)電子通訊"
 
-    cate = input('Select a category: ')
-    pagenum = input('How many Pages：')
-     
+    #Get input of Job Category type & main URL  & number of pages to read 
+    cate = input('---Select a category: ')
+    mainURL = raw_input("---URL : ") 
+    pagenum = input('---How many Pages：')
+
+    #Use dict type to decide which categiry type was selected
     category= { 1: "資訊工程",2: "人事行政",3: "金融保險", 4: "生活服務", \
                        5: "醫療保健", 6: "採購物流", 7: "餐飲服務",8: "電子通訊"}
+    
+    #Create  URLparser object
+    url_data = parser.URLparser()       
 
-    url = 'http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=120100&si=1&ps=40&trans=1' +'&page='
-    url_data = parser.URLparser()       # create   URLparser  object
 
-    #  parsing each page 
+    '''<<<<<<Get all the link  in each pages>>>>>>>'''
     for  page in range(1, pagenum+1):
-        mainpage = url + str(page)
-        #create  SGMLParser object
-        url_data.feed( urllib2.urlopen(mainpage).read() )   #Feed content to parser 
+        #www.1111.com  pages is controled by  &page= <num>
+        #so can <num> we can read each page from main page
+        mainpage = mainURL + '&page=' + str(page)
 
+        #Feed content to parser , get the link's url in <dl id="job_result"> tag 
+        url_data.feed( urllib2.urlopen(mainpage).read() )  
+
+        #Print total number of URLs
         sys.stdout.write('catching urls ... ['+str( len(url_data.urls) )+"]\r")
-        sys.stdout.flush()
+        sys.stdout.flush()  #Flush the buffer
+    #For loop end
 
-    url_data.close()       #clear buffer    
-     
-     
-    html = parser.htmlparser()  # create   htmlparser  object
+
+    #Create MS_SQL object , information of database
     sql = sql.MS_SQL('140.116.86.51','sa','imilab0936200028*','IMI_db_project')
-    urlencode = ""
-    urlremove = 0
-    count = 1 
+
+    #Create  htmlparser object
+    html = parser.htmlparser() 
+
+    #Create  ProgressBar object , print process during parsing webpage  
     progress = ProgressBar( len( url_data.urls ) )
 
+    urlencode = ""     #Save encoded URL
+    urlremove = 0      #Record number of missing pages
+    id_count = 1         #Represent key value in the database table 
 
+    #Connect to the MS SQL server
     sql.connect()
 
+    #Print information of start parsing process
     print "\nstart parsing websites ..."
-    #get data from web   
-    for i in url_data.urls:
 
+
+    '''<<<<<<Parsing all webpage we had got>>>>>>>'''
+    for i in url_data.urls:         
+        #Reset data in the htmlparser while starting parsing new page
         html.resetdata()
-
+         
+        #Print progress bar in the screen
         progress.start()
 
+        #Use try & exception to avoid feeding missing webpage
+        #to  htmlparser , record missing webpage by urlremove
         try:
+             
+             #Because /tab in the http will lead to error
+             #so replace UTF-8 code /tab (=%09) to /space (=%20)
              urlencode = "http://www.1111.com.tw"+  urllib.quote(i ).replace('%09','%20')
+
              urlobject   = urllib2.urlopen( urlencode )
              html.feed( urlobject.read() )
+
         except urllib2.HTTPError:
              urlremove += 1
 
-
-        # id name content  location time holiday property category salary employee class url
-        #sql.insert(str(count) , html.name , html.list[1] , html.list[2] , html.list[3] , "taiwan" ,\
-                         #html.list[4] , html.list[5] , html.list[6] , html.list[7] , category[cate] , urlencode )
-        #sql.insert(str(count),"1","1","1","1","1","1","1","1","1","1","1")
-                       
-        count+=1
-
+        #Save date into the database table
+        #attributes:  id name content  location time holiday property category salary employee class url
+        sql.insert(str(id_count) , html.name , html.list[1] , html.list[2] , html.list[3] , "taiwan" ,\
+                         html.list[4] , html.list[5] , html.list[6] , html.list[7] , category[cate] , urlencode )
+        
+        #Id of data +1 
+        id_count+=1
+    #For loop end
 
 
     #print result
-    print "\n\n -- [DONE] --"
-    print "Finished---------[" +str(count-urlremove-1)+"/"+str(count-1) +"]"
-    print "Html not found---[",urlremove ,'] \n --' 
-
-    html.close()   #clear buffer   
+    print "\n   \n   -- [Finished] --"
+    print "   Done ... [" +str(id_count-urlremove-1)+"/"+str(id_count-1) +"]"
+    print "   Html not found ... [",urlremove ,'] \n' 
+    
+    #Force processing of all buffered
+    url_data.close()     
+    html.close()  
   

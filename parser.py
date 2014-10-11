@@ -109,12 +109,13 @@ class URLparser(SGMLParser):
         #using original reset function
         SGMLParser.reset(self)
         #initialization
-        self.check_dl= False               # checking <dl> tag 
-        self.check_dd= False              #  checking <dd> tag
-        self.check_li= False                #  checking <li> tag
+        self.check_dl= False        # checking <dl> tag 
+        self.check_dd= False       #  checking <dd> tag
+        self.check_li= False         #  checking <li> tag
+        self.urls = []          #Store all url 
+
         self.dl_attr = ('id', 'job_result')                   # use for searching  <dl> tag  with "id = job_result" 
-        self.a_attr =('class', 'showPositionCss')     # use for searching  <a> tag with "id = showPositionCss"
-        self.urls = []  
+        self.a_attr =('class', 'showPositionCss')     # use for searching  <a> tag with "id = showPositionCss"         
 
     # clear all data in the urls
     def  clearURLs(self):
