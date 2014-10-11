@@ -1,41 +1,42 @@
 # -*- coding: UTF-8 -*-
 from sgmllib import SGMLParser
 
-
-##    html parser    ##
-##   save data from web page
+'''-------------------------------------------
+-    html parser                             
+-   Get data from web page
+-------------------------------------------'''
 class htmlparser(SGMLParser):
   
     def reset(self):    
         #using original reset function
         SGMLParser.reset(self)
         #initialization
-        self.contentCheck = False                 # 'contentCheck'  for checking main content   <dl>  tag
-        self.check_div = False
-        self.check_h2 = False
-        self.check_dt = False                         # 'check_dt ' for checking  title    <dt> tag
-        self.check_dd = False                        # 'check_dd' for  checking  attribute    <dd> tag
+        self.check_div = False           # 'check_div ' for checking  title <div> tag
+        self.check_h2 = False            # 'check_h2 ' for checking  title <h2> tag
+        self.check_dt = False             # 'check_dt ' for checking  title <dt> tag
+        self.check_dd = False            # 'check_dd' for  checking  attribute  <dd> tag
+
         self.tag_attr =  ('class', 'section w570')    # 'tag_attr'  for checking  < dl> 's  attribute
-        self.list_type = ""
-        self.name = ""
-        self.list = {}
+        self.list_type = ""    #Decide which  table attribute is reading 
+        self.name = ""        #Job title
+        self.list = {}            #Save data of all attribute (type : dict)
 
     def  resetdata(self): 
         self.list_type =""
         self.name = ""
         self.list = { 1: "",2: "",3: "", 4: "", 5: "", 6: "", 7: ""}
 
-     # checking main content , when read <dl> set  contentCheck =true
+     # checking main content , when read <div> set  check_div =true
     def start_div (self, attrs):
-        #check <dl>  with  one attribute
+        #check <div>  with  one attribute
         if len(attrs)  ==1: 
-          #compare attribute with  [ class =""datalist ]
-          #if true than set contentCheck to true
+          #compare attribute with  [ class ="section w570" ]
+          #if true than set check_div to true
           if cmp(attrs[0] , self.tag_attr )==0:
               self.check_div=1
 
-    # stop parsing main content when read </dl>
-    def end_dl (self):
+    # stop parsing main content when read </div>
+    def end_div (self):
         self.check_div=False
 
     def start_h2(self, attrs):
@@ -64,45 +65,51 @@ class htmlparser(SGMLParser):
              #print  "\n"  
         self.check_dd=False
 
-    #get the data  between <dt> and  </dt>  for  title
-    #                                     <dd> and </dd>  for  contents
-    
+    #Reading content in <div> get the data  between
+    # <h2> and  </h2>  for  title & <dd> and </dd>  for  contents 
     def handle_data(self, text):  
         if self.check_div:
-
+           #Get job titile 
            if self.check_h2: 
                 self.name = text
-
+             
+           #Get type of attribute  
            elif self.check_dt :
                 self.list_type = text
-
+           #Save data to corresponding attribute
            elif   self.check_dd:
-                if self.list_type == '工作內容：' :
-                      text = text.replace(",", "")
+                if self.list_type == '工作內容：' :  #content
+                      #Trim ' , ' in the string
+                      text = text.replace(",", "")  
                       self.list[1] += text 
-                elif self.list_type == '工作地點：' :
+                elif self.list_type == '工作地點：' : #location
                       self.list[2] += text 
-                elif self.list_type == '工作時間：' :
+                elif self.list_type == '工作時間：' : #time
                       self.list[3] += text 
-                elif self.list_type == '工作性質：' :
+                elif self.list_type == '工作性質：' : #property
                       self.list[4] += text 
-                elif self.list_type == '職務類別：' :
+                elif self.list_type == '職務類別：' : #catogory
                       self.list[5] += text 
-                elif self.list_type == '工作待遇：' :
+                elif self.list_type == '需求人數：' : #people require
+                      self.list[7] += text
+                elif self.list_type == '工作待遇：' : # salary
+                       #There two type in salary  面議 & salary
+                       #and we will get the max salary if its not 面議
                       if text != '面議　'  :     
-                           text = text.replace(",", "").replace("元", "").replace(" ", "")          
+                           #Trim ' , '  & ' 元 '  & /space in the string 
+                           text = text.replace(",", "").replace("元", "").replace(" ", "")
+                           #Get the number in the string           
                            if "至" in text :
                                text =  text[ text.index('至')+3 : ]
                            else:
                                text =  text[ text.index('薪')+3 : ]
+                      #Save result         
                       self.list[6] += text 
-                elif self.list_type == '需求人數：' :
-                      self.list[7] += text 
 
-
-
-##   html parser ##
-##   save data from web page
+'''-------------------------------------------
+-    URL  parser                             
+-   Get all links from web page
+-------------------------------------------'''
 class URLparser(SGMLParser):
 
     def reset(self):

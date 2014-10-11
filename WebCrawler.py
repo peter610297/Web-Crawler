@@ -38,6 +38,7 @@ if __name__ == "__main__":
     cate = input('---Select a category: ')
     mainURL = raw_input("---URL : ") 
     pagenum = input('---How many Pages：')
+    password = raw_input('---Password : ')
 
     #Use dict type to decide which categiry type was selected
     category= { 1: "資訊工程",2: "人事行政",3: "金融保險", 4: "生活服務", \
@@ -63,7 +64,7 @@ if __name__ == "__main__":
 
 
     #Create MS_SQL object , information of database
-    sql = sql.MS_SQL('140.116.86.51','sa','imilab0936200028*','IMI_db_project')
+    sql = sql.MS_SQL('140.116.86.51','sa',password,'IMI_db_project')
 
     #Create  htmlparser object
     html = parser.htmlparser() 
@@ -93,15 +94,16 @@ if __name__ == "__main__":
         #Use try & exception to avoid feeding missing webpage
         #to  htmlparser , record missing webpage by urlremove
         try:
-             
              #Because /tab in the http will lead to error
              #so replace UTF-8 code /tab (=%09) to /space (=%20)
              urlencode = "http://www.1111.com.tw"+  urllib.quote(i ).replace('%09','%20')
 
              urlobject   = urllib2.urlopen( urlencode )
+
              html.feed( urlobject.read() )
 
         except urllib2.HTTPError:
+             #Plus 1 to urlremove if http 404 not found
              urlremove += 1
 
         #Save date into the database table
