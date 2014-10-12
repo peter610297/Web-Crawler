@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
 from __future__ import division
-from sgmllib import SGMLParser
 import urllib
 import urllib2
 import sys 
@@ -81,9 +80,6 @@ if __name__ == "__main__":
 
     #Connect to the MS SQL server
     sql.connect()
-    
-    #Get start time 
-    timestart = time.time()
 
     #Print information of start parsing process
     print "\nstart parsing websites ..."
@@ -120,8 +116,6 @@ if __name__ == "__main__":
         #Id of data +1 
         id_count+=1
     
-    #Get end time
-    timeup =time.time()
 
     #print final result
     print "\n   \n   -- [Finished] --"
@@ -133,14 +127,14 @@ if __name__ == "__main__":
     if not os.path.exists('log'): 
          os.makedirs('log')
     
-    #Write log
+    #Write log and get execution time
     logfile = open('log/log', 'a+')
-    logfile.write( "#Finished time: "+str( time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(timeup)) )+"\n" )
-    logfile.write( "#Time cost: "+str( time.strftime('%M:%S', time.localtime(timeup - timestart )) ) +"\n")    
-    logfile.write( "done_"+str(id_count-urlremove - sql.error - 1 )+"/"+str(id_count-1)+\
-                           "-notfound_"+str(urlremove)+\
-                           "-serverError_"+str(sql.error)+\
-                           "-category_"+category[cate]+"\n\n")  
+    logfile.write( str( time.strftime('%Y-%m-%d-%H:%M:%S', time.localtime( time.time() )) )+ \
+                           " done-"+str(id_count-urlremove - sql.error - 1 )+"/"+str(id_count-1)+\
+                           " notfound-"+str(urlremove)+\
+                           " serverError-"+str(sql.error)+\
+                           " category-"+category[cate]+\
+                           "\n"+mainURL+"\n\n" )  
 
 
     #Force processing of all buffered & close database server connection
