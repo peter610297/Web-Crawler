@@ -60,7 +60,7 @@ if __name__ == "__main__":
         #Print total number of URLs
         sys.stdout.write('catching urls ... ['+str( len(url_data.urls) )+"]\r")
         sys.stdout.flush()  #Flush the buffer
-    #For loop end
+
 
 
     #Create MS_SQL object , information of database
@@ -113,15 +113,15 @@ if __name__ == "__main__":
         
         #Id of data +1 
         id_count+=1
-    #For loop end
 
 
-    #print result
+    #print final result
     print "\n   \n   -- [Finished] --"
-    print "   Done ... [" +str(id_count-urlremove-1)+"/"+str(id_count-1) +"]"
-    print "   Html not found ... [",urlremove ,'] \n' 
+    print "   Done ... [" +str(id_count-urlremove - sql.error - 1 )+"/"+str(id_count-1) +"]"
+    print "   Html not found ... [",urlremove ,'] ' 
+    print "   SQL server ERROR ... [",sql.error ,'] \n' 
     
-    #Force processing of all buffered
+    #Force processing of all buffered & close database server connection
     url_data.close()     
     html.close()  
-  
+    sql.close_conn()

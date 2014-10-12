@@ -1,10 +1,11 @@
 # -*- coding: UTF-8 -*-
+
 from sgmllib import SGMLParser
 
-'''-------------------------------------------
--    html parser                             
--   Get data from web page
--------------------------------------------'''
+
+'''---------------html parser ---------------                            
+         Get data from web page
+---------------------------------------------------'''
 class htmlparser(SGMLParser):
   
     def reset(self):    
@@ -106,10 +107,9 @@ class htmlparser(SGMLParser):
                       #Save result         
                       self.list[6] += text 
 
-'''-------------------------------------------
--    URL  parser                             
--   Get all links from web page
--------------------------------------------'''
+'''---------------URL  parser ---------------                            
+       Get all links from web page
+---------------------------------------------------'''
 class URLparser(SGMLParser):
 
     def reset(self):
