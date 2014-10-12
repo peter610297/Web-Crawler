@@ -107,6 +107,8 @@ class htmlparser(SGMLParser):
                       #Save result         
                       self.list[6] += text 
 
+
+
 '''---------------URL  parser ---------------                            
        Get all links from web page
 ---------------------------------------------------'''

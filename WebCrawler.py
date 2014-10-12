@@ -5,6 +5,9 @@ from sgmllib import SGMLParser
 import urllib
 import urllib2
 import sys 
+import os
+import time
+import datetime
 import sql        
 import parser
 
@@ -78,6 +81,9 @@ if __name__ == "__main__":
 
     #Connect to the MS SQL server
     sql.connect()
+    
+    #Get start time 
+    timestart = time.time()
 
     #Print information of start parsing process
     print "\nstart parsing websites ..."
@@ -108,20 +114,37 @@ if __name__ == "__main__":
 
         #Save date into the database table
         #attributes:  id name content  location time holiday property category salary employee class url
-        sql.insert(str(id_count) , html.name , html.list[1] , html.list[2] , html.list[3] , "taiwan" ,\
+        sql.insert(str(id_count) , html.name , html.list[1] , html.list[2] , html.list[3] , "never mind" ,\
                          html.list[4] , html.list[5] , html.list[6] , html.list[7] , category[cate] , urlencode )
         
         #Id of data +1 
         id_count+=1
-
+    
+    #Get end time
+    timeup =time.time()
 
     #print final result
     print "\n   \n   -- [Finished] --"
     print "   Done ... [" +str(id_count-urlremove - sql.error - 1 )+"/"+str(id_count-1) +"]"
     print "   Html not found ... [",urlremove ,'] ' 
     print "   SQL server ERROR ... [",sql.error ,'] \n' 
+
+    #Check log folder, if not exit then create 
+    if not os.path.exists('log'): 
+         os.makedirs('log')
     
+    #Write log
+    logfile = open('log/log', 'a+')
+    logfile.write( "#Finished time: "+str( time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(timeup)) )+"\n" )
+    logfile.write( "#Time cost: "+str( time.strftime('%M:%S', time.localtime(timeup - timestart )) ) +"\n")    
+    logfile.write( "done_"+str(id_count-urlremove - sql.error - 1 )+"/"+str(id_count-1)+\
+                           "-notfound_"+str(urlremove)+\
+                           "-serverError_"+str(sql.error)+\
+                           "-category_"+category[cate]+"\n\n")  
+
+
     #Force processing of all buffered & close database server connection
     url_data.close()     
     html.close()  
+    logfile.close()
     sql.close_conn()
