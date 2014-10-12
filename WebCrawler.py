@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-
 from __future__ import division
 import urllib
 import urllib2
@@ -68,6 +67,9 @@ if __name__ == "__main__":
     #Create MS_SQL object , information of database
     sql = sql.MS_SQL('140.116.86.51','sa',password,'IMI_db_project')
 
+    #Connect to the MS SQL server
+    sql.connect()
+
     #Create  htmlparser object
     html = parser.htmlparser() 
 
@@ -76,10 +78,8 @@ if __name__ == "__main__":
 
     urlencode = ""     #Save encoded URL
     urlremove = 0      #Record number of missing pages
-    id_count = 1         #Represent key value in the database table 
-
-    #Connect to the MS SQL server
-    sql.connect()
+    id_count =  sql.getID()       #Represent key value in the database table 
+    URLnum =  len(url_data.urls)       #get total url  quantity
 
     #Print information of start parsing process
     print "\nstart parsing websites ..."
@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
     #print final result
     print "\n   \n   -- [Finished] --"
-    print "   Done ... [" +str(id_count-urlremove - sql.error - 1 )+"/"+str(id_count-1) +"]"
+    print "   Done ... [" +str(URLnum - urlremove - sql.error )+"/"+str( URLnum ) +"]"
     print "   Html not found ... [",urlremove ,'] ' 
     print "   SQL server ERROR ... [",sql.error ,'] \n' 
 
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     #Write log and get execution time
     logfile = open('log/log', 'a+')
     logfile.write( str( time.strftime('%Y-%m-%d-%H:%M:%S', time.localtime( time.time() )) )+ \
-                           " done-"+str(id_count-urlremove - sql.error - 1 )+"/"+str(id_count-1)+\
+                           " done-"+str( URLnum - urlremove - sql.error )+"/"+str(URLnum)+\
                            " notfound-"+str(urlremove)+\
                            " serverError-"+str(sql.error)+\
                            " category-"+category[cate]+\

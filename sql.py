@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-
 import _mssql
 
 class MS_SQL():
@@ -15,10 +14,19 @@ class MS_SQL():
     def connect(self):
         self.conn = _mssql.connect(server=self.host, user=self.user, password=self.password, database=self.db)
      
+     #Return the max id of the table
+    def getID(self):
+         #Check if table already have  data
+         if  not self.conn.execute_scalar("SELECT MAX(id) FROM result2") :
+         	return 1
+         #Return the max number 
+         else : 	
+         	return self.conn.execute_scalar("SELECT MAX(id) FROM result2") + 1
+
     #Insert data to the table
     def insert(self, id, name, c, loc, time, h, p, cate, sal, emp, cla, url):
         try:
-             self.conn.execute_non_query("INSERT INTO result VALUES( '"+id+ "','"+name+ "','"+c+ "','"+loc+ "','"+time+ "','"+h+ "',\
+             self.conn.execute_non_query("INSERT INTO result2 VALUES( '"+id+ "','"+name+ "','"+c+ "','"+loc+ "','"+time+ "','"+h+ "',\
         	                                                                                                       '"+p+ "','"+cate+ "','"+sal+ "','"+emp+ "','"+cla+ "','"+url+ "')" )
         except _mssql.MssqlDatabaseException,e:
         	self.error += 1
