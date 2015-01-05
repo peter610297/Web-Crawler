@@ -28,6 +28,7 @@ class ProgressBar():
          self.count +=1
 
 
+
 if __name__ == "__main__":
 
     #Print all Categories of the job
@@ -48,8 +49,10 @@ if __name__ == "__main__":
     #Create  URLparser object
     url_data = parser.URLparser()       
 
-
-    '''<<<<<<Get all the link  in each pages>>>>>>>'''
+    '''
+    ''Get all the link  in each pages
+    ''
+    '''
     for  page in range(1, pagenum+1):
         #www.1111.com  pages is controled by  &page= <num>
         #so can <num> we can read each page from main page
@@ -65,13 +68,15 @@ if __name__ == "__main__":
 
 
     #Create MS_SQL object , information of database
-    sql = sql.MS_SQL('140.116.86.51','sa',password,'IMI_db_project')
+    sql = sql.MS_SQL('140.116.86.51','sa',"imilab0936200028*",'IMI_db_project')
 
     #Connect to the MS SQL server
     sql.connect()
 
+
     #Create  htmlparser object
     html = parser.htmlparser() 
+    com = parser.comparser()
 
     #Create  ProgressBar object , print process during parsing webpage  
     progress = ProgressBar( len( url_data.urls ) )
@@ -79,13 +84,17 @@ if __name__ == "__main__":
     urlencode = ""     #Save encoded URL
     urlremove = 0      #Record number of missing pages
     id_count =  sql.getID()       #Represent key value in the database table 
-    URLnum =  len(url_data.urls)       #get total url  quantity
+    URLnum =  len(url_data.urls)  #get total url  quantity
 
     #Print information of start parsing process
     print "\nstart parsing websites ..."
 
 
-    '''<<<<<<Parsing all webpage we had got>>>>>>>'''
+
+    '''
+    ''Parsing all webpage we got
+    ''
+    '''
     for i in url_data.urls:         
         #Reset data in the htmlparser while starting parsing new page
         html.resetdata()
@@ -100,22 +109,35 @@ if __name__ == "__main__":
              #so replace UTF-8 code /tab (=%09) to /space (=%20)
              urlencode = "http://www.1111.com.tw"+  urllib.quote(i ).replace('%09','%20')
 
-             urlobject   = urllib2.urlopen( urlencode )
+             html.feed( urllib2.urlopen(urlencode).read() )
 
-             html.feed( urlobject.read() )
+             #get company information
+             com_url = "http://www.1111.com.tw"+ urllib.quote(html.comurl ).replace('%09','%20')
+             com.feed( urllib2.urlopen( com_url ).read() )
 
         except urllib2.HTTPError:
              #Plus 1 to urlremove if http 404 not found
              urlremove += 1
 
+
+
+        '''
+        ''Insert data inte database 
+        ''
+        '''
         #Save date into the database table
         #attributes:  id name content  location time holiday property category salary employee class url
-        sql.insert(str(id_count) , html.name , html.list[1] , html.list[2] , html.list[3] , "never mind" ,\
+        sql.insert_JOB(str(id_count) , html.name , html.list[1] , html.list[2] , html.list[3] , "never mind" ,\
                          html.list[4] , html.list[5] , html.list[6] , html.list[7] , category[cate] , urlencode )
         
+        if sql.getComName(com.name):
+            sql.insert_CORPORATION(com.name, com.site, com.address)
+
         #Id of data +1 
         id_count+=1
     
+
+
 
     #print final result
     print "\n   \n   -- [Finished] --"
@@ -127,6 +149,7 @@ if __name__ == "__main__":
     if not os.path.exists('log'): 
          os.makedirs('log')
     
+
     #Write log and get execution time
     logfile = open('log/log', 'a+')
     logfile.write( str( time.strftime('%Y-%m-%d-%H:%M:%S', time.localtime( time.time() )) )+ \
