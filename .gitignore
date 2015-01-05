@@ -3,3 +3,6 @@
 
 #Ignore all  logfile
 log/
+
+#Ignore testing file
+test.py

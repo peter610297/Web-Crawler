@@ -2,9 +2,72 @@
 from sgmllib import SGMLParser
 
 
+'''---------------company parser ---------------                            
+         Get data from company page
+-----------------------------------------------'''
+class comparser(SGMLParser):
+  
+    def reset(self):    
+        SGMLParser.reset(self)
+        self.name = ""
+        self.site = ""
+        self.address = ""
+
+        self.dl_attr = ('class', 'dataList')           # use for searching  <dl> tag  with "id = job_result" 
+        self.attr = ""
+        self.check_dl = False
+        self.check_dt = False
+        self.check_dd = False
+
+     # when read <dl> set  contentCheck =true
+    def start_dl (self, attrs):
+        # read <dl> tag with 2 attributes
+        if len(attrs)  == 1: 
+             # set check_dl when <dl>  attribute equal to ('class', 'dataList')
+            if cmp(attrs[0] , self.dl_attr ) == 0 :
+                 self.check_dl= 1
+
+    #stop parsing <dl> tag 
+    def end_dl (self):
+        self.check_dl= False
+
+    def start_dt (self, attrs):
+        if self.check_dl:
+            self.check_dt = 1
+
+    # stop parsing <dd> tag
+    def end_dt (self ):
+        self.check_dt = False
+
+    def start_dd (self, attrs):
+        if self.check_dl:
+            self.check_dd = 1
+
+    # stop parsing <dd> tag
+    def end_dd (self ):
+        self.check_dd = False
+
+    #Reading content in <div> get the data  between
+    # <h2> and  </h2>  for  title & <dd> and </dd>  for  contents 
+    def handle_data(self, text): 
+        if self.check_dl:  
+            if self.check_dt:
+                self.attr = text 
+            elif self.check_dd :
+                text = text.replace(",", "").replace(" ", "")
+                if self.attr == '公司名稱：' and text != "商業登記" :
+                    self.name = text
+                elif self.attr == '聯絡地址：' and text != "" :
+                    self.address  = text 
+                elif self.attr == '網站位址：' and text != "" :
+                    self.site = text
+
+
+
+
 '''---------------html parser ---------------                            
-         Get data from web page
----------------------------------------------------'''
+          Get data from web page
+-----------------------------------------------'''
 class htmlparser(SGMLParser):
   
     def reset(self):    
@@ -15,16 +78,22 @@ class htmlparser(SGMLParser):
         self.check_h2 = False            # 'check_h2 ' for checking  title <h2> tag
         self.check_dt = False             # 'check_dt ' for checking  title <dt> tag
         self.check_dd = False            # 'check_dd' for  checking  attribute  <dd> tag
+        self.check_a = False 
+        self.check_ul = False 
 
-        self.tag_attr =  ('class', 'section w570')    # 'tag_attr'  for checking  < dl> 's  attribute
+        self.tag_attr1 =  ('class', 'section w570')    # 'tag_attr'  for checking  < dl> 's  attribute
+        self.tag_attr2 =  ('class', 'navbar')
         self.list_type = ""    #Decide which  table attribute is reading 
         self.name = ""        #Job title
         self.list = {}            #Save data of all attribute (type : dict)
+        self.tempcomurl = ""
+        self.comurl = ""
 
     def  resetdata(self): 
         self.list_type =""
         self.name = ""
         self.list = { 1: "",2: "",3: "", 4: "", 5: "", 6: "", 7: ""}
+        self.tempcomurl = ""
 
      # checking main content , when read <div> set  check_div =true
     def start_div (self, attrs):
@@ -32,7 +101,7 @@ class htmlparser(SGMLParser):
         if len(attrs)  ==1: 
           #compare attribute with  [ class ="section w570" ]
           #if true than set check_div to true
-          if cmp(attrs[0] , self.tag_attr )==0:
+          if cmp(attrs[0] , self.tag_attr1 )==0:
               self.check_div=1
 
     # stop parsing main content when read </div>
@@ -65,9 +134,28 @@ class htmlparser(SGMLParser):
              #print  "\n"  
         self.check_dd=False
 
+    # For getting company information page
+
+    def start_ul(self, attrs):
+      if len(attrs)  ==1: 
+          if cmp(attrs[0] , self.tag_attr2 )==0:
+              self.check_ul = 1
+
+    def end_ul(self):
+        self.check_ul = False
+
+    def start_a(self, attrs):
+        if self.check_ul: 
+            self.tempcomurl = [v for k, v in attrs if k=='href'] 
+            self.check_a = 1
+
+    def end_a(self):
+        self.check_a = False
+
     #Reading content in <div> get the data  between
     # <h2> and  </h2>  for  title & <dd> and </dd>  for  contents 
     def handle_data(self, text):  
+
         if self.check_div:
            #Get job titile 
            if self.check_h2: 
@@ -106,6 +194,9 @@ class htmlparser(SGMLParser):
                       #Save result         
                       self.list[6] += text 
 
+        elif  self.check_a: 
+            if text == "公司基本資料": 
+                self.comurl = self.tempcomurl[0]
 
 
 '''---------------URL  parser ---------------                            
@@ -117,12 +208,12 @@ class URLparser(SGMLParser):
         #using original reset function
         SGMLParser.reset(self)
         #initialization
-        self.check_dl= False        # checking <dl> tag 
-        self.check_dd= False       #  checking <dd> tag
-        self.check_li= False         #  checking <li> tag
+        self.check_dl= False    # checking <dl> tag 
+        self.check_dd= False    #  checking <dd> tag
+        self.check_li= False    #  checking <li> tag
         self.urls = []          #Store all url 
 
-        self.dl_attr = ('id', 'job_result')                   # use for searching  <dl> tag  with "id = job_result" 
+        self.dl_attr = ('id', 'job_result')           # use for searching  <dl> tag  with "id = job_result" 
         self.a_attr =('class', 'showPositionCss')     # use for searching  <a> tag with "id = showPositionCss"         
 
     # clear all data in the urls
