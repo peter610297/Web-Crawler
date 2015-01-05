@@ -31,6 +31,8 @@ class ProgressBar():
 
 if __name__ == "__main__":
 
+
+
     #Print all Categories of the job
     print "--- [Category] ---"
     print "(1)資訊工程(2)人事行政(3)金融保險(4)生活服務"
@@ -48,6 +50,8 @@ if __name__ == "__main__":
     
     #Create  URLparser object
     url_data = parser.URLparser()       
+
+
 
     '''
     ''Get all the link  in each pages
@@ -81,10 +85,14 @@ if __name__ == "__main__":
     #Create  ProgressBar object , print process during parsing webpage  
     progress = ProgressBar( len( url_data.urls ) )
 
+
+
     urlencode = ""     #Save encoded URL
     urlremove = 0      #Record number of missing pages
     id_count =  sql.getID()       #Represent key value in the database table 
     URLnum =  len(url_data.urls)  #get total url  quantity
+
+
 
     #Print information of start parsing process
     print "\nstart parsing websites ..."
@@ -115,6 +123,8 @@ if __name__ == "__main__":
              com_url = "http://www.1111.com.tw"+ urllib.quote(html.comurl ).replace('%09','%20')
              com.feed( urllib2.urlopen( com_url ).read() )
 
+
+
         except urllib2.HTTPError:
              #Plus 1 to urlremove if http 404 not found
              urlremove += 1
@@ -125,11 +135,12 @@ if __name__ == "__main__":
         ''Insert data inte database 
         ''
         '''
-        #Save date into the database table
+        #Save date into the JOB table
         #attributes:  id name content  location time holiday property category salary employee class url
         sql.insert_JOB(str(id_count) , html.name , html.list[1] , html.list[2] , html.list[3] , "never mind" ,\
                          html.list[4] , html.list[5] , html.list[6] , html.list[7] , category[cate] , urlencode )
         
+        #Save date into the CORPORATION table
         if sql.getComName(com.name):
             sql.insert_CORPORATION(com.name, com.site, com.address)
 
@@ -142,7 +153,7 @@ if __name__ == "__main__":
     #print final result
     print "\n   \n   -- [Finished] --"
     print "   Done ... [" +str(URLnum - urlremove - sql.error )+"/"+str( URLnum ) +"]"
-    print "   Html not found ... [",urlremove ,'] ' 
+    print "   Webpage not found ... [",urlremove ,'] ' 
     print "   SQL server ERROR ... [",sql.error ,'] \n' 
 
     #Check log folder, if not exit then create 

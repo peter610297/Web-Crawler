@@ -35,7 +35,7 @@ class MS_SQL():
     def insert_LOCATION(self, id, name, c, loc, time, h, p, cate, sal, emp, cla, url):
         try:
              self.conn.execute_non_query("INSERT INTO result2 VALUES( '"+id+ "','"+name+ "','"+c+ "','"+loc+ "','"+time+ "','"+h+ "',\
-                                                                                                                   '"+p+ "','"+cate+ "','"+sal+ "','"+emp+ "','"+cla+ "','"+url+ "')" )
+                                                                      '"+p+ "','"+cate+ "','"+sal+ "','"+emp+ "','"+cla+ "','"+url+ "')" )
         except _mssql.MssqlDatabaseException,e:
             self.error += 1
 
