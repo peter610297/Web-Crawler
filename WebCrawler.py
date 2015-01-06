@@ -32,7 +32,7 @@ class ProgressBar():
 if __name__ == "__main__":
 
 
-
+    '''
     #Print all Categories of the job
     print "--- [Category] ---"
     print "(1)資訊工程(2)人事行政(3)金融保險(4)生活服務"
@@ -42,7 +42,17 @@ if __name__ == "__main__":
     cate = input('---Select a category: ')
     mainURL = raw_input("---URL : ") 
     pagenum = input('---How many Pages：')
+    location = raw_input('---Location(n/e/s/w) : ')
     password = raw_input('---Password : ')
+    '''
+    #testing
+    cate=1
+    mainURL="http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=140200&t0=100101&si=1&ps=40&trans=1"
+    pagenum=1
+    location ='n'
+
+
+
 
     #Use dict type to decide which categiry type was selected
     category= { 1: "資訊工程",2: "人事行政",3: "金融保險", 4: "生活服務", \
@@ -50,7 +60,6 @@ if __name__ == "__main__":
     
     #Create  URLparser object
     url_data = parser.URLparser()       
-
 
 
     '''
@@ -79,7 +88,7 @@ if __name__ == "__main__":
 
 
     #Create  htmlparser object
-    html = parser.htmlparser() 
+    job = parser.jobparser() 
     com = parser.comparser()
 
     #Create  ProgressBar object , print process during parsing webpage  
@@ -105,7 +114,7 @@ if __name__ == "__main__":
     '''
     for i in url_data.urls:         
         #Reset data in the htmlparser while starting parsing new page
-        html.resetdata()
+        job.resetdata()
          
         #Print progress bar in the screen
         progress.start()
@@ -117,10 +126,10 @@ if __name__ == "__main__":
              #so replace UTF-8 code /tab (=%09) to /space (=%20)
              urlencode = "http://www.1111.com.tw"+  urllib.quote(i ).replace('%09','%20')
 
-             html.feed( urllib2.urlopen(urlencode).read() )
+             job.feed( urllib2.urlopen(urlencode).read() )
 
              #get company information
-             com_url   = "http://www.1111.com.tw"+ urllib.quote(html.comurl ).replace('%09','%20')
+             com_url   = "http://www.1111.com.tw"+ urllib.quote(job.comurl ).replace('%09','%20')
              com.feed( urllib2.urlopen( com_url ).read() )
 
 
@@ -135,11 +144,13 @@ if __name__ == "__main__":
         ''Insert data inte database 
         ''
         '''
+
+                     #(self, id, name, c, cla, time, sal, h, req, addr, loc, corpName):
         #Save date into the JOB table
         #attributes:  id name content  location time holiday property category salary employee class url
-        '''sql.insert_JOB(str(id_count) , html.name , html.list[1] , html.list[2] , html.list[3] , "never mind" ,\
-                         html.list[4] , html.list[5] , html.list[6] , html.list[7] , category[cate] , urlencode )
-        '''
+        sql.insert_JOB(str(id_count) , job.name , job.list[1] , job.list[5] , job.list[3] , job.list[6] ,\
+                        "never", job.list[7] , job.list[2] , location , com.name )
+
         #Save date into the CORPORATION table
         if sql.getComName(com.name):
             sql.insert_CORPORATION(com.name, com.site, com.address)
@@ -173,6 +184,6 @@ if __name__ == "__main__":
 
     #Force processing of all buffered & close database server connection
     url_data.close()     
-    html.close()  
+    job.close()  
     logfile.close()
     sql.close_conn()

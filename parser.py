@@ -66,9 +66,9 @@ class comparser(SGMLParser):
 
 
 '''---------------html parser ---------------                            
-          Get data from web page
+          Get data from Job information page
 -----------------------------------------------'''
-class htmlparser(SGMLParser):
+class jobparser(SGMLParser):
   
     def reset(self):    
         #using original reset function
@@ -170,7 +170,7 @@ class htmlparser(SGMLParser):
                       #Trim ' , ' in the string
                       text = text.replace(",", "")  
                       self.list[1] += text 
-                elif self.list_type == '工作地點：' : #location
+                elif self.list_type == '工作地點：' : #address
                       self.list[2] += text 
                 elif self.list_type == '工作時間：' : #time
                       self.list[3] += text 

@@ -6,3 +6,5 @@ log/
 
 #Ignore testing file
 test.py
+.gitignore
+

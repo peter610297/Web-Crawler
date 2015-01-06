@@ -36,23 +36,15 @@ class MS_SQL():
     def close_conn(self):
         self.conn.close()
 
-    '''
-    ''Data Insert Functions of Database Table
+    '''Data Insert Functions of Database Table.
+    ''
     ''
     '''
-    #Insert data to the table
-    def insert_LOCATION(self, id, name, c, loc, time, h, p, cate, sal, emp, cla, url):
-        try:
-             self.conn.execute_non_query("INSERT INTO result2 VALUES( '"+id+ "','"+name+ "','"+c+ "','"+loc+ "','"+time+ "','"+h+ "',\
-                                                                      '"+p+ "','"+cate+ "','"+sal+ "','"+emp+ "','"+cla+ "','"+url+ "')" )
-        except _mssql.MssqlDatabaseException,e:
-            self.error += 1
 
     #Insert data to the table
-    def insert_JOB(self, id, name, c, loc, time, h, p, cate, sal, emp, cla, url):
+    def insert_JOB(self, id, name, c, cla, time, sal, h, req, addr, loc, corpName):
         try:
-             self.conn.execute_non_query("INSERT INTO JOB VALUES( '"+id+ "','"+name+ "','"+c+ "','"+loc+ "','"+time+ "','"+h+ "',\
-                                                                  '"+p+ "','"+cate+ "','"+sal+ "','"+emp+ "','"+cla+ "','"+url+ "')" )
+             self.conn.execute_non_query("INSERT INTO JOB VALUES( '"+id+ "','"+name+ "','"+c+"','"+cla+ "','"+time+ "','"+sal+ "','"+h+ "','"+req+ "','"+addr+ "','"+loc+ "','"+corpName+ "')" )
         except _mssql.MssqlDatabaseException,e:
             self.error += 1
 
