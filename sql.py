@@ -25,12 +25,21 @@ class MS_SQL():
 
     def getComName(self, name):
          #Check if table already have  data
-         if  not self.conn.execute_scalar("SELECT name FROM CORPORATION WHERE name = '"+name+"' ") :
+         if  not self.conn.execute_scalar("SELECT corp_name FROM CORPORATION WHERE corp_name = '"+name+"' ") :
             return 1
          #Return the max number 
          else :     
             return False
 
+
+   #Close databse connection
+    def close_conn(self):
+        self.conn.close()
+
+    '''
+    ''Data Insert Functions of Database Table
+    ''
+    '''
     #Insert data to the table
     def insert_LOCATION(self, id, name, c, loc, time, h, p, cate, sal, emp, cla, url):
         try:
@@ -48,12 +57,10 @@ class MS_SQL():
             self.error += 1
 
     #Insert data to the table
-    def insert_CORPORATION(self, corname, site, address):
+    def insert_CORPORATION(self, corp_name, site, corp_address):
         try:
-             self.conn.execute_non_query("INSERT INTO CORPORATION VALUES( '"+corname+ "','"+site+ "','"+address+ "')" )
+             self.conn.execute_non_query("INSERT INTO CORPORATION VALUES( '"+corp_name+ "','"+site+ "','"+corp_address+ "')" )
         except _mssql.MssqlDatabaseException,e:
             self.error += 1
 
-   #Close databse connection
-    def close_conn(self):
-        self.conn.close()
+

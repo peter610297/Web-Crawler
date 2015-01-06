@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
     urlencode = ""     #Save encoded URL
     urlremove = 0      #Record number of missing pages
-    id_count =  sql.getID()       #Represent key value in the database table 
+    id_count = 0 #sql.getID()       #Represent key value in the database table 
     URLnum =  len(url_data.urls)  #get total url  quantity
 
 
@@ -120,7 +120,7 @@ if __name__ == "__main__":
              html.feed( urllib2.urlopen(urlencode).read() )
 
              #get company information
-             com_url = "http://www.1111.com.tw"+ urllib.quote(html.comurl ).replace('%09','%20')
+             com_url   = "http://www.1111.com.tw"+ urllib.quote(html.comurl ).replace('%09','%20')
              com.feed( urllib2.urlopen( com_url ).read() )
 
 
@@ -137,9 +137,9 @@ if __name__ == "__main__":
         '''
         #Save date into the JOB table
         #attributes:  id name content  location time holiday property category salary employee class url
-        sql.insert_JOB(str(id_count) , html.name , html.list[1] , html.list[2] , html.list[3] , "never mind" ,\
+        '''sql.insert_JOB(str(id_count) , html.name , html.list[1] , html.list[2] , html.list[3] , "never mind" ,\
                          html.list[4] , html.list[5] , html.list[6] , html.list[7] , category[cate] , urlencode )
-        
+        '''
         #Save date into the CORPORATION table
         if sql.getComName(com.name):
             sql.insert_CORPORATION(com.name, com.site, com.address)
