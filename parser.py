@@ -165,7 +165,7 @@ class jobparser(SGMLParser):
            elif self.check_dt :
                 self.list_type = text
            #Save data to corresponding attribute
-           elif   self.check_dd:
+           elif self.check_dd:
                 if self.list_type == '工作內容：' :  #content
                       #Trim ' , ' in the string
                       text = text.replace(",", "")  
@@ -174,7 +174,7 @@ class jobparser(SGMLParser):
                       self.list[2] += text 
                 elif self.list_type == '工作時間：' : #time
                       self.list[3] += text 
-                elif self.list_type == '工作性質：' : #property
+                elif self.list_type == '休假制度：' : #property
                       self.list[4] += text 
                 elif self.list_type == '職務類別：' : #catogory
                       self.list[5] += text 
@@ -193,6 +193,7 @@ class jobparser(SGMLParser):
                                text =  text[ text.index('薪')+3 : ]
                       #Save result         
                       self.list[6] += text 
+                  
 
         elif  self.check_a: 
             if text == "公司基本資料": 

@@ -17,11 +17,11 @@ class MS_SQL():
      #Return the max id of the table
     def getID(self):
          #Check if table already have  data
-         if  not self.conn.execute_scalar("SELECT MAX(id) FROM result2") :
+         if  not self.conn.execute_scalar("SELECT MAX(id) FROM JOB") :
             return 1
          #Return the max number 
          else :     
-            return self.conn.execute_scalar("SELECT MAX(id) FROM result2") + 1
+            return self.conn.execute_scalar("SELECT MAX(id) FROM JOB") + 1
 
     def getComName(self, name):
          #Check if table already have  data

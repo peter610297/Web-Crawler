@@ -31,8 +31,7 @@ class ProgressBar():
 
 if __name__ == "__main__":
 
-
-    '''
+    
     #Print all Categories of the job
     print "--- [Category] ---"
     print "(1)資訊工程(2)人事行政(3)金融保險(4)生活服務"
@@ -43,20 +42,11 @@ if __name__ == "__main__":
     mainURL = raw_input("---URL : ") 
     pagenum = input('---How many Pages：')
     location = raw_input('---Location(n/e/s/w) : ')
-    password = raw_input('---Password : ')
-    '''
-    #testing
-    cate=1
-    mainURL="http://www.1111.com.tw/job-bank/job-index.asp?ss=s&tt=1,2,4,16&d0=140200&t0=100101&si=1&ps=40&trans=1"
-    pagenum=1
-    location ='n'
-
-
 
 
     #Use dict type to decide which categiry type was selected
     category= { 1: "資訊工程",2: "人事行政",3: "金融保險", 4: "生活服務", \
-                       5: "醫療保健", 6: "採購物流", 7: "餐飲服務",8: "電子通訊"}
+                5: "醫療保健", 6: "採購物流", 7: "餐飲服務",8: "電子通訊"}
     
     #Create  URLparser object
     url_data = parser.URLparser()       
@@ -98,7 +88,7 @@ if __name__ == "__main__":
 
     urlencode = ""     #Save encoded URL
     urlremove = 0      #Record number of missing pages
-    id_count = 0 #sql.getID()       #Represent key value in the database table 
+    id_count = sql.getID()       #Represent key value in the database table 
     URLnum =  len(url_data.urls)  #get total url  quantity
 
 
@@ -145,11 +135,11 @@ if __name__ == "__main__":
         ''
         '''
 
-                     #(self, id, name, c, cla, time, sal, h, req, addr, loc, corpName):
+        #(self, id, name, c, cla, time, sal, h, req, addr, loc, corpName):
         #Save date into the JOB table
         #attributes:  id name content  location time holiday property category salary employee class url
-        sql.insert_JOB(str(id_count) , job.name , job.list[1] , job.list[5] , job.list[3] , job.list[6] ,\
-                        "never", job.list[7] , job.list[2] , location , com.name )
+        sql.insert_JOB(str(id_count) , job.name , job.list[1] , category , job.list[3] , job.list[6] ,\
+                        job.list[4], job.list[7] , job.list[2] , location , com.name )
 
         #Save date into the CORPORATION table
         if sql.getComName(com.name):
