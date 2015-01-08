@@ -34,8 +34,8 @@ if __name__ == "__main__":
     
     #Print all Categories of the job
     print "--- [Category] ---"
-    print "(1)資訊工程(2)人事行政(3)金融保險(4)生活服務"
-    print "(5)醫療保健(6)採購物流(7)餐飲服務(8)電子通訊"
+    print "(1)生產製程(2)光電半導體(3)軟體工程"
+    print "(4)電腦硬體(5)系統規劃(6)網路管理"
 
     #Get input of Job Category type & main URL  & number of pages to read 
     cate = input('---Select a category: ')
@@ -45,8 +45,8 @@ if __name__ == "__main__":
 
 
     #Use dict type to decide which categiry type was selected
-    category= { 1: "資訊工程",2: "人事行政",3: "金融保險", 4: "生活服務", \
-                5: "醫療保健", 6: "採購物流", 7: "餐飲服務",8: "電子通訊"}
+    category= { 1: "生產製程",2: "光電半導體",3: "軟體工程", 4: "電腦硬體", \
+                5: "系統規劃", 6: "網路管理"}
     
     #Create  URLparser object
     url_data = parser.URLparser()       
@@ -138,7 +138,7 @@ if __name__ == "__main__":
         #(self, id, name, c, cla, time, sal, h, req, addr, loc, corpName):
         #Save date into the JOB table
         #attributes:  id name content  location time holiday property category salary employee class url
-        sql.insert_JOB(str(id_count) , job.name , job.list[1] , category , job.list[3] , job.list[6] ,\
+        sql.insert_JOB(str(id_count) , job.name , job.list[1] , category[cate] , job.list[3] , job.list[6] ,\
                         job.list[4], job.list[7] , job.list[2] , location , com.name )
 
         #Save date into the CORPORATION table
